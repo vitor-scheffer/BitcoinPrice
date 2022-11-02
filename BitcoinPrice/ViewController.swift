@@ -19,8 +19,13 @@ class ViewController: UIViewController {
                         do {
                             if let objetoJson = try JSONSerialization.jsonObject(with: dadosRetorno, options: []) as? [String: Any] {
                                 if let brl = objetoJson["BRL"] as? [String: Any] {
-                                    if let buyPrice = brl["buy"] as? Float {
-                                        print(buyPrice)
+                                    if let buyPrice = brl["buy"] {
+                                        let nf = NumberFormatter()
+                                        nf.numberStyle = .decimal
+                                        nf.locale = Locale(identifier: "pt_BR")
+                                        if let buyPriceFormated = nf.string(from: buyPrice as! NSNumber) {
+                                            print(buyPriceFormated)
+                                        }
                                     }
                                 }
                             }
