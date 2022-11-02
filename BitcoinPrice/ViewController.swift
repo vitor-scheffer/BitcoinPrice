@@ -22,6 +22,16 @@ class ViewController: UIViewController {
         self.updateBitcoinPrice()
     }
     
+    func formatarPreco(preco: NSNumber) -> String {
+        let nf = NumberFormatter()
+        nf.numberStyle = .decimal
+        nf.locale = Locale(identifier: "pt_BR")
+        if let priceFormated = nf.string(from: preco) {
+            return priceFormated
+        }
+        return "R$ 0.00"
+    }
+    
     func updateBitcoinPrice() {
         self.botaoAtualizar.setTitle("Atualizando...", for: .normal)
         if let baseUrl = URL(string: "https://blockchain.info/ticker") {
@@ -31,16 +41,13 @@ class ViewController: UIViewController {
                         do {
                             if let objetoJson = try JSONSerialization.jsonObject(with: dadosRetorno, options: []) as? [String: Any] {
                                 if let brl = objetoJson["BRL"] as? [String: Any] {
-                                    if let buyPrice = brl["buy"] {
-                                        let nf = NumberFormatter()
-                                        nf.numberStyle = .decimal
-                                        nf.locale = Locale(identifier: "pt_BR")
-                                        if let buyPriceFormated = nf.string(from: buyPrice as! NSNumber) {
+                                    if let buyPrice = brl["buy"] as? Double {
+                                        let buyPriceFormated = self.formatarPreco(preco: NSNumber(value: buyPrice))
+                                        
                                             DispatchQueue.main.async(execute: {
-                                                self.precoBitcoin.text = "R$" + buyPriceFormated
+                                                self.precoBitcoin.text = "R$ " + buyPriceFormated
                                                 self.botaoAtualizar.setTitle("Atualizar", for: .normal)
                                             })
-                                        }
                                     }
                                 }
                             }
