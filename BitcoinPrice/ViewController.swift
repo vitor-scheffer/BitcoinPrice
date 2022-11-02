@@ -9,9 +9,21 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var precoBitcoin: UILabel!
+    @IBOutlet weak var botaoAtualizar: UIButton!
+    
+    @IBAction func handlePriceUpdate(_ sender: Any) {
+        self.updateBitcoinPrice()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.updateBitcoinPrice()
+    }
+    
+    func updateBitcoinPrice() {
+        self.botaoAtualizar.setTitle("Atualizando...", for: .normal)
         if let baseUrl = URL(string: "https://blockchain.info/ticker") {
             let tarefa = URLSession.shared.dataTask(with: baseUrl) { dados, requisicao, erro in
                 if erro == nil {
@@ -24,7 +36,10 @@ class ViewController: UIViewController {
                                         nf.numberStyle = .decimal
                                         nf.locale = Locale(identifier: "pt_BR")
                                         if let buyPriceFormated = nf.string(from: buyPrice as! NSNumber) {
-                                            print(buyPriceFormated)
+                                            DispatchQueue.main.async(execute: {
+                                                self.precoBitcoin.text = "R$" + buyPriceFormated
+                                                self.botaoAtualizar.setTitle("Atualizar", for: .normal)
+                                            })
                                         }
                                     }
                                 }
@@ -39,9 +54,6 @@ class ViewController: UIViewController {
             }
             tarefa.resume()
         }
-        
     }
-
-
 }
 
